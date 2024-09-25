@@ -36,14 +36,12 @@ def create_tables(conn):
         CONSTRAINT pk_clients_phone PRIMARY KEY (client_id, phone_id) 
         );
         """)
-    conn.commit()
 
 # 2. Функция, позволяющая добавить нового клиента.
 def add_new_client(conn, id, name, surname, email):
     cur.execute("""
         INSERT INTO clients VALUES(%s, %s, %s, %s);
         """, (id, name, surname, email,))
-    conn.commit()  # фиксируем в БД
 
 # 3. Функция, позволяющая добавить телефон для существующего клиента.
 def add_new_phone(conn, phone, id_client):
@@ -80,7 +78,6 @@ def add_new_phone(conn, phone, id_client):
         cur.execute("""
             INSERT INTO clients_phones VALUES(%s, %s);
             """, (id_client, id_phone,))
-        conn.commit()
 
 # 4. Функция, позволяющая изменить данные о клиенте.
 def edit_client_data(conn, id, name='', surname='', email=''):
@@ -108,7 +105,6 @@ def edit_client_data(conn, id, name='', surname='', email=''):
         #(name, surname, email, id)
         sql_values = tuple(sql_values_list)
         cur.execute(sql_string, sql_values)
-        conn.commit()
 
 # 5. Функция, позволяющая удалить телефон для существующего клиента.
 # У клиента может быть несколько телефонов, но удаляется лишь один из них.
@@ -132,7 +128,6 @@ def delete_phone(conn, id_phone, id_client):
             DELETE FROM phones 
             WHERE id = %s;
             """, (id_phone,))
-        conn.commit()
 
 # 6. Функция, позволяющая удалить существующего клиента.
 def delete_client(conn, id):
@@ -152,7 +147,6 @@ def delete_client(conn, id):
         DELETE FROM clients
         WHERE id = %s;
         """, (id,))
-    conn.commit()
 
 # 7. Функция, позволяющая найти клиента по его: имени, фамилии, email или телефону.
 def search_client(conn, name = '', surname = '', email = '', phone = ''):
@@ -196,7 +190,6 @@ def del_tables(conn):
         DROP TABLE IF EXISTS phones CASCADE;
         DROP TABLE IF EXISTS clients_phones
         """)
-    conn.commit()
 
 # Функция для поиска id клиента/клиентов по номеру телефона:
 # возвращает список с id (либо пустой список, если ничего не найдено)
@@ -288,3 +281,4 @@ with psycopg2.connect(database = db, user = db_user, password = db_password) as 
         print(search_client(conn, phone = '12-34-56'))
         print(search_client(conn, 'Мария', 'Фывапровна', 'marfiv@mmm.m', '7891011'))
         print(search_client(conn, name = 'Игорь', surname = 'Молчунов'))
+conn.close()
